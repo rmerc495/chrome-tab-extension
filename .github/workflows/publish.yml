@@ -1,0 +1,135 @@
+name: Publish to Chrome Web Store
+
+# Publishes when you push a version tag (e.g. v1.1.2), or via manual run.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Submit the uploaded version for review after upload"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Package and publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify manifest version matches tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          MANIFEST_VERSION="$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")"
+          echo "Tag version:      ${TAG}"
+          echo "Manifest version: ${MANIFEST_VERSION}"
+          if [ "${TAG}" != "${MANIFEST_VERSION}" ]; then
+            echo "::error::Tag v${TAG} does not match manifest.json version ${MANIFEST_VERSION}. Bump manifest.json before tagging."
+            exit 1
+          fi
+
+      - name: Package extension.zip
+        run: |
+          chmod +x scripts/package.sh
+          ./scripts/package.sh
+
+      - name: Upload extension.zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-zip
+          path: extension.zip
+          if-no-files-found: error
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Authenticate as Google service account
+        id: auth
+        env:
+          CHROME_SERVICE_ACCOUNT_JSON: ${{ secrets.CHROME_SERVICE_ACCOUNT_JSON }}
+        run: |
+          pip install --quiet "google-auth==2.*"
+          python3 <<'PY'
+          import json
+          import os
+          from google.auth.transport.requests import Request
+          from google.oauth2 import service_account
+
+          raw = os.environ.get("CHROME_SERVICE_ACCOUNT_JSON", "").strip()
+          if not raw:
+              raise SystemExit("Missing secret CHROME_SERVICE_ACCOUNT_JSON")
+
+          info = json.loads(raw)
+          creds = service_account.Credentials.from_service_account_info(
+              info,
+              scopes=["https://www.googleapis.com/auth/chromewebstore"],
+          )
+          creds.refresh(Request())
+          token = creds.token
+          print(f"::add-mask::{token}")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+              fh.write(f"access_token={token}\n")
+          print("Obtained Chrome Web Store access token.")
+          PY
+
+      - name: Upload package to Chrome Web Store
+        env:
+          TOKEN: ${{ steps.auth.outputs.access_token }}
+          PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
+          EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+        run: |
+          set -euo pipefail
+          : "${TOKEN:?missing token}"
+          : "${PUBLISHER_ID:?missing CHROME_PUBLISHER_ID}"
+          : "${EXTENSION_ID:?missing CHROME_EXTENSION_ID}"
+
+          echo "Uploading extension.zip to Chrome Web Store..."
+          RESPONSE="$(curl -sS -X POST \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/zip" \
+            --data-binary @extension.zip \
+            "https://chromewebstore.googleapis.com/upload/v2/publishers/${PUBLISHER_ID}/items/${EXTENSION_ID}:upload")"
+          echo "${RESPONSE}"
+          echo "${RESPONSE}" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          if data.get('error'):
+              print('Upload failed:', json.dumps(data, indent=2), file=sys.stderr)
+              sys.exit(1)
+          state = data.get('uploadState') or data.get('status') or ''
+          print('Upload response state:', state or '(see raw JSON above)')
+          "
+
+      - name: Submit version for review
+        if: github.event_name == 'push' || inputs.publish
+        env:
+          TOKEN: ${{ steps.auth.outputs.access_token }}
+          PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
+          EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+        run: |
+          set -euo pipefail
+          echo "Submitting item for Chrome Web Store review..."
+          RESPONSE="$(curl -sS -X POST \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "https://chromewebstore.googleapis.com/v2/publishers/${PUBLISHER_ID}/items/${EXTENSION_ID}:publish")"
+          echo "${RESPONSE}"
+          echo "${RESPONSE}" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          if data.get('error'):
+              print('Publish failed:', json.dumps(data, indent=2), file=sys.stderr)
+              sys.exit(1)
+          print('Submitted for review successfully.')
+          "

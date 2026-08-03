@@ -4,3 +4,11 @@ desktop.ini
 *.log
 .vscode/
 .idea/
+
+# Packaging / publish artifacts
+extension.zip
+.package-stage/
+*.pem
+*-key.json
+credentials.json
+service-account*.json
