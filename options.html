@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Duplicate Tab Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <h1>Duplicate Tab</h1>
+        <p class="subtitle">Settings</p>
+      </header>
+
+      <section class="section" aria-labelledby="shortcut-heading">
+        <h2 id="shortcut-heading">Keyboard shortcut</h2>
+        <p class="hint">
+          Chrome only allows shortcut changes on its built-in shortcuts page.
+          Use the button below to open it and assign
+          <strong>Duplicate selected tab(s)</strong>.
+        </p>
+        <div class="shortcut-row">
+          <button type="button" id="open-shortcuts" class="button">
+            Assign shortcut
+          </button>
+          <p id="shortcut-current" class="shortcut-current">
+            Current Shortcut: …
+          </p>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="single-heading">
+        <h2 id="single-heading">Single tab placement</h2>
+        <p class="hint">
+          Where a duplicate goes when only one tab is selected.
+        </p>
+        <fieldset class="choices">
+          <legend class="sr-only">Single tab placement</legend>
+          <label class="choice">
+            <input
+              type="radio"
+              name="singleTabPlacement"
+              value="next_to_origin"
+            />
+            <span>
+              <span class="choice-title">Next to the original tab</span>
+              <span class="choice-desc"
+                >Insert the duplicate immediately to the right of the
+                origin tab.</span
+              >
+            </span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="singleTabPlacement" value="end_of_list" />
+            <span>
+              <span class="choice-title">End of the tab list</span>
+              <span class="choice-desc"
+                >Place the duplicate at the very end of the window’s
+                tabs.</span
+              >
+            </span>
+          </label>
+        </fieldset>
+      </section>
+
+      <section class="section" aria-labelledby="multi-heading">
+        <h2 id="multi-heading">Multiple tab placement</h2>
+        <p class="hint">
+          Where duplicates go when several tabs are highlighted.
+        </p>
+        <fieldset class="choices">
+          <legend class="sr-only">Multiple tab placement</legend>
+          <label class="choice">
+            <input
+              type="radio"
+              name="multiTabPlacement"
+              value="next_to_each"
+            />
+            <span>
+              <span class="choice-title">Next to each original</span>
+              <span class="choice-desc"
+                >Insert each duplicate beside its origin tab (staggered
+                pattern).</span
+              >
+            </span>
+          </label>
+          <label class="choice">
+            <input
+              type="radio"
+              name="multiTabPlacement"
+              value="after_last_selected"
+            />
+            <span>
+              <span class="choice-title"
+                >After the last selected tab</span
+              >
+              <span class="choice-desc"
+                >Duplicate all selected tabs, then place every new tab
+                immediately after the last highlighted tab.</span
+              >
+            </span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="multiTabPlacement" value="end_of_list" />
+            <span>
+              <span class="choice-title">End of the tab list</span>
+              <span class="choice-desc"
+                >Place all duplicated tabs at the very end of the
+                window.</span
+              >
+            </span>
+          </label>
+        </fieldset>
+      </section>
+
+      <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
+    </main>
+    <script src="options.js"></script>
+  </body>
+</html>

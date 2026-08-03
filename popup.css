@@ -1,0 +1,69 @@
+:root {
+  --text: #1a2330;
+  --muted: #5b6777;
+  --border: #d5dbe3;
+  --hover: #eef3f1;
+  --on: #0f6e56;
+  --off: #8a94a1;
+  font-family: "Segoe UI", "Candara", "Gill Sans", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 200px;
+  color: var(--text);
+  background: #fff;
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  padding: 0.35rem;
+}
+
+.menu-item {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 550;
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: var(--hover);
+}
+
+.menu-item:focus-visible {
+  outline: 2px solid var(--on);
+  outline-offset: -2px;
+}
+
+.status {
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.status.on {
+  color: var(--on);
+}
+
+.status.off {
+  color: var(--off);
+}
