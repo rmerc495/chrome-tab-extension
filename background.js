@@ -121,7 +121,16 @@ async function duplicateTabs() {
   await duplicateGrouped(highlighted, activeId, multiPlacement);
 }
 
+let lastDuplicateAt = 0;
+
 function runDuplicate() {
+  const now = Date.now();
+  // Content-script capture and chrome.commands can both fire for one keypress.
+  if (now - lastDuplicateAt < 400) {
+    return;
+  }
+  lastDuplicateAt = now;
+
   duplicateTabs().catch((err) => {
     console.error("Duplicate Tab failed:", err);
   });
@@ -129,6 +138,12 @@ function runDuplicate() {
 
 chrome.commands.onCommand.addListener((command) => {
   if (command === "duplicate-tabs") {
+    runDuplicate();
+  }
+});
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message?.type === "duplicate-tabs") {
     runDuplicate();
   }
 });

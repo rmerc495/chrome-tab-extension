@@ -12,6 +12,7 @@ mkdir -p "${STAGE}"
 # Copy only the files Chrome needs to load the extension.
 cp "${ROOT}/manifest.json" "${STAGE}/"
 cp "${ROOT}/background.js" "${STAGE}/"
+cp "${ROOT}/shortcut.js" "${STAGE}/"
 cp "${ROOT}/popup.html" "${ROOT}/popup.js" "${ROOT}/popup.css" "${STAGE}/"
 cp "${ROOT}/options.html" "${ROOT}/options.js" "${ROOT}/options.css" "${STAGE}/"
 cp -R "${ROOT}/icons" "${STAGE}/icons"

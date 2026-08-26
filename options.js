@@ -67,7 +67,7 @@ async function refreshShortcut() {
   const shortcut = command?.shortcut?.trim();
 
   shortcutCurrentEl.replaceChildren();
-  shortcutCurrentEl.append("Current Shortcut: ");
+  shortcutCurrentEl.append("Chrome shortcuts page: ");
 
   if (shortcut) {
     const value = document.createElement("strong");

@@ -1,13 +1,23 @@
 {
   "manifest_version": 3,
   "name": "Duplicate Tab",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Duplicate the active tab or all highlighted tabs, with placement options.",
   "permissions": ["tabs", "storage"],
   "incognito": "spanning",
   "background": {
     "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["shortcut.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true,
+      "match_origin_as_fallback": true
+    }
+  ],
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true

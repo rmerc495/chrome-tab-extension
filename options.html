@@ -16,16 +16,22 @@
       <section class="section" aria-labelledby="shortcut-heading">
         <h2 id="shortcut-heading">Keyboard shortcut</h2>
         <p class="hint">
-          Chrome only allows shortcut changes on its built-in shortcuts page.
-          Use the button below to open it and assign
-          <strong>Duplicate selected tab(s)</strong>.
+          <strong>Ctrl+Shift+D</strong> (Windows/Linux) or
+          <strong>Cmd+Shift+D</strong> (Mac) is built into this extension.
+          On regular web pages it takes that combination away from Chrome’s
+          “Bookmark all tabs” command.
+        </p>
+        <p class="hint">
+          Chrome still owns the shortcut on its own pages (New Tab,
+          Settings, the Web Store, and other <code>chrome://</code> URLs).
+          Assign the same keys below if you want duplication there too.
         </p>
         <div class="shortcut-row">
           <button type="button" id="open-shortcuts" class="button">
-            Assign shortcut
+            Assign for Chrome pages
           </button>
           <p id="shortcut-current" class="shortcut-current">
-            Current Shortcut: …
+            Chrome shortcuts page: …
           </p>
         </div>
       </section>
@@ -116,6 +122,7 @@
 
       <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
     </main>
+    <script src="shortcut.js"></script>
     <script src="options.js"></script>
   </body>
 </html>

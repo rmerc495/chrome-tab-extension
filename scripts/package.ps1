@@ -12,6 +12,7 @@ if (Test-Path $Out) { Remove-Item -Force $Out }
 $files = @(
   "manifest.json",
   "background.js",
+  "shortcut.js",
   "popup.html",
   "popup.js",
   "popup.css",
